@@ -1,0 +1,22 @@
+meta {
+  name: Delete ExTable
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/ex-tables/{{exTableId}}
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test("Status code is 204", function () {
+      expect(res.getStatus()).to.equal(204);
+  });
+  
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,39 @@
+meta {
+  name: Get Transactions - Combined Filters
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/v1/transactions?page=1&limit=3&status=Pending
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 1
+  limit: 3
+  status: Pending
+}
+
+script:post-response {
+  test("Status code is 200", function () {
+      expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Pagination and status filter applied", function () {
+      const jsonData = res.getBody();
+      expect(jsonData.page).to.equal(1);
+      expect(jsonData.limit).to.equal(3);
+      
+      if (jsonData.data.length > 0) {
+          jsonData.data.forEach(transaction => {
+              expect(transaction.status).to.equal("Pending");
+          });
+      }
+  });
+}
+
+settings {
+  encodeUrl: true
+}

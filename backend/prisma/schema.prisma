@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Status {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum BankType {
+  BCEL
+  JDB
+  LDB
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  username  String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model ExTable {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String   @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String   @map("updated_by")
+
+  @@map("ex_table")
+}
+
+model Transactions {
+  id             String   @id @default(uuid()) @db.Uuid
+  transaction_id String   @map("transaction_id")
+  merchant_id    String   @map("merchant_id")
+  order_id       String   @map("order_id")
+  merchant_name  String   @map("merchant_name")
+  amount         Float
+  status         Status
+  created_at     DateTime @default(now()) @map("created_at")
+  updated_at     DateTime @updatedAt @map("updated_at")
+  post_request   String   @map("post_request")
+  bank_request   String   @map("bank_request")
+  bank_response  String   @map("bank_response")
+  bank_type      BankType
+
+  @@map("transactions")
+}

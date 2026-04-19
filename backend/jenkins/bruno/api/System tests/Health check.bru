@@ -1,0 +1,28 @@
+meta {
+  name: Health check
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test("Status code is 200", function () {
+      expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has status and code", function () {
+      const jsonData = res.getBody();
+      expect(jsonData).to.have.property("status");
+      expect(jsonData).to.have.property("code", 200);
+  });
+  
+}
+
+settings {
+  encodeUrl: true
+}

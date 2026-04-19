@@ -1,0 +1,33 @@
+meta {
+  name: Get Transactions - Invalid Parameters
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/v1/transactions?page=invalid&limit=abc
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: invalid
+  limit: abc
+}
+
+script:post-response {
+  test("Status code is 400 or handles gracefully", function () {
+      expect(res.getStatus()).to.be.oneOf([400, 200]);
+  });
+  
+  if (res.getStatus() === 200) {
+      test("Invalid parameters handled gracefully", function () {
+          const jsonData = res.getBody();
+          expect(jsonData).to.have.property("data");
+      });
+  }
+}
+
+settings {
+  encodeUrl: true
+}

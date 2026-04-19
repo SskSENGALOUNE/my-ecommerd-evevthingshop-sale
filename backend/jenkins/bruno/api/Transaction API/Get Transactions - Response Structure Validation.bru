@@ -1,0 +1,49 @@
+meta {
+  name: Get Transactions - Response Structure Validation
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/v1/transactions?limit=1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 1
+}
+
+script:post-response {
+  test("Status code is 200", function () {
+      expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Transaction objects have required fields", function () {
+      const jsonData = res.getBody();
+      
+      if (jsonData.data.length > 0) {
+          const transaction = jsonData.data[0];
+          expect(transaction).to.have.property("transectionId");
+          expect(transaction).to.have.property("merchantId");
+          expect(transaction).to.have.property("orderId");
+          expect(transaction).to.have.property("merchant_name");
+          expect(transaction).to.have.property("amount");
+          expect(transaction).to.have.property("status");
+          expect(transaction).to.have.property("createdAt");
+      }
+  });
+  
+  test("Amount is a number", function () {
+      const jsonData = res.getBody();
+      
+      if (jsonData.data.length > 0) {
+          const transaction = jsonData.data[0];
+          expect(transaction.amount).to.be.a('number');
+      }
+  });
+}
+
+settings {
+  encodeUrl: true
+}

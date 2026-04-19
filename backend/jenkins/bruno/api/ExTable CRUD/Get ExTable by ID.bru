@@ -1,0 +1,27 @@
+meta {
+  name: Get ExTable by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/ex-tables/{{exTableId}}
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test("Status code is 200", function () {
+      expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has correct ID", function () {
+      const jsonData = res.getBody();
+      expect(jsonData.id).to.equal(bru.getVar("exTableId"));
+  });
+  
+}
+
+settings {
+  encodeUrl: true
+}

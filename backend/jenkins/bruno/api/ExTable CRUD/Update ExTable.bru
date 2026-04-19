@@ -1,0 +1,38 @@
+meta {
+  name: Update ExTable
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/ex-tables/{{exTableId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+      "name": "Updated Test Record",
+      "updatedBy": "test-user"
+  }
+}
+
+script:post-response {
+  test("Status code is 200", function () {
+      expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Record was updated", function () {
+      const jsonData = res.getBody();
+      expect(jsonData.name).to.equal("Updated Test Record");
+  });
+  
+}
+
+settings {
+  encodeUrl: true
+}
