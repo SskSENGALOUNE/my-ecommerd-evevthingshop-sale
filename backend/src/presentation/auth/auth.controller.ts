@@ -1,57 +1,36 @@
-import { Controller, Post, Body, Get, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
-import { LoginCommand } from '../../application/auth/commands/login.command';
-import { RegisterCommand } from '../../application/auth/commands/register.command';
-import { Public } from './decorators/public.decorator';
-import { Roles } from './decorators/roles.decorator';
-import { CurrentUser } from './decorators/current-user.decorator';
-import { RolesGuard } from './guards/roles.guard';
-import { UserRole } from '../../domain/user/user.entity';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { AdminLoginDto } from './dto/admin-login.dto';
+import { CustomerLoginDto } from './dto/customer-login.dto';
+import { CustomerRegisterDto } from './dto/customer-register.dto';
+import { AdminLoginCommand } from '../../application/auth/commands/admin-login.command';
+import { CustomerLoginCommand } from '../../application/auth/commands/customer-login.command';
+import { CustomerRegisterCommand } from '../../application/auth/commands/customer-register.command';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly commandBus: CommandBus) {}
 
-  @Public()
-  @Post('login')
+  @Post('admin/login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login' })
-  @ApiResponse({ status: 200, description: 'Returns JWT access token' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(@Body() dto: LoginDto) {
-    return this.commandBus.execute(new LoginCommand(dto.username, dto.password));
+  @ApiOperation({ summary: 'Admin login' })
+  async adminLogin(@Body() dto: AdminLoginDto) {
+    return this.commandBus.execute(new AdminLoginCommand(dto.email, dto.password));
   }
 
-  @Public()
-  @Post('register')
+  @Post('customer/login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Customer login' })
+  async customerLogin(@Body() dto: CustomerLoginDto) {
+    return this.commandBus.execute(new CustomerLoginCommand(dto.email, dto.password));
+  }
+
+  @Post('customer/register')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Register new user' })
-  @ApiResponse({ status: 201, description: 'User created' })
-  @ApiResponse({ status: 409, description: 'Username already taken' })
-  async register(@Body() dto: RegisterDto) {
-    const { password, ...result } = await this.commandBus.execute(
-      new RegisterCommand(dto.username, dto.password, dto.role),
-    );
-    return result;
-  }
-
-  @Get('me')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get current user info' })
-  async me(@CurrentUser() user: { id: string; username: string; role: string }) {
-    return user;
-  }
-
-  @Get('admin-only')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Admin-only endpoint example' })
-  adminOnly(@CurrentUser() user: { id: string; username: string; role: string }) {
-    return { message: 'Welcome, Admin!', user };
+  @ApiOperation({ summary: 'Customer register' })
+  async customerRegister(@Body() dto: CustomerRegisterDto) {
+    return this.commandBus.execute(new CustomerRegisterCommand(dto.email, dto.password, dto.name, dto.phone));
   }
 }

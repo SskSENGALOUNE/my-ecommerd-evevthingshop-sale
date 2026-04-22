@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
-import { KafkaModule } from './messaging/kafka.module';
 import { ExModuleInfrastructureModule } from './ex-module/ex-module-infrastructure.module';
 import { TransactionInfrastructureModule } from './transaction/transaction-infrastructure.module';
+import { AuthInfrastructureModule } from './auth/auth-infrastructure.module';
 
 @Module({
   imports: [
     PrismaModule,
-    // KafkaModule,
     ExModuleInfrastructureModule,
     TransactionInfrastructureModule,
+    AuthInfrastructureModule,
   ],
   exports: [
     PrismaModule,
-    // KafkaModule,
     ExModuleInfrastructureModule,
     TransactionInfrastructureModule,
+    AuthInfrastructureModule,
   ],
 })
 export class InfrastructureModule {}

@@ -3,9 +3,10 @@ import { ExTableModule } from './ex-module/ex-table.module';
 import { ApplicationModule } from '../application/application.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TransactionModule } from './transaction/transaction.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [CqrsModule, ApplicationModule, ExTableModule, TransactionModule],
+  imports: [CqrsModule, ApplicationModule, ExTableModule, TransactionModule, AuthModule],
   exports: [ExTableModule],
 })
 export class PresentationModule {}

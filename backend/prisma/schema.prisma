@@ -10,9 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
+// ============================================
+// ENUMS
+// ============================================
+
+enum AdminRole {
+  SUPER_ADMIN
   ADMIN
-  USER
 }
 
 enum Status {
@@ -27,16 +31,83 @@ enum BankType {
   LDB
 }
 
-model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  username  String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("users")
+enum PaymentMethod {
+  QR  // โอนผ่าน QR + แนบสลิป
+  COD // เก็บเงินปลายทาง
 }
+
+enum OrderStatus {
+  PENDING // รอชำระเงิน
+  CONFIRMED // ยืนยันชำระเงินแล้ว
+  PROCESSING // กำลังเตรียมของ
+  SHIPPED // ส่งแล้ว
+  DELIVERED // ลูกค้าได้รับ
+  CANCELLED // ยกเลิก
+  REFUNDED // คืนเงิน
+}
+
+enum ShipmentStatus {
+  PREPARING
+  SHIPPED
+  DELIVERED
+}
+
+enum InventoryReason {
+  PURCHASE // รับของเข้า
+  SALE // ขายออก
+  ADJUSTMENT // ปรับสต็อก manual
+  RETURN // คืนสินค้า
+  RESERVATION // จอง (ใส่ตะกร้า/checkout)
+  RESERVATION_RELEASE // ปล่อยจอง (timeout/cancel)
+}
+
+// ============================================
+// AUTH
+// ============================================
+
+model Admin {
+  id       String    @id @default(uuid()) @db.Uuid
+  email    String    @unique
+  password String
+  name     String
+  role     AdminRole @default(ADMIN)
+  isActive Boolean   @default(true) @map("is_active")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  verifiedTransactions Transactions[] @relation("TransactionVerifier")
+
+  @@index([email])
+  @@map("admins")
+}
+
+model Customer {
+  id       String  @id @default(uuid()) @db.Uuid
+  email    String  @unique
+  password String
+  name     String
+  phone    String?
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  addresses Address[]
+  cart      Cart?
+  orders    Order[]
+
+  @@index([email])
+  @@map("customers")
+}
+
+// ============================================
+// EX TABLE (boilerplate reference)
+// ============================================
 
 model ExTable {
   id        String   @id @default(uuid()) @db.Uuid
@@ -49,20 +120,354 @@ model ExTable {
   @@map("ex_table")
 }
 
+// ============================================
+// PRODUCT
+// ============================================
+
+model Category {
+  id       String  @id @default(uuid()) @db.Uuid
+  name     String
+  slug     String  @unique
+  parentId String? @map("parent_id") @db.Uuid
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Self-relation สำหรับ sub-category
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([slug])
+  @@index([parentId])
+  @@map("categories")
+}
+
+model Product {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String  @unique
+  description String? @db.Text
+  basePrice   Decimal @map("base_price") @db.Decimal(10, 2)
+  sku         String  @unique
+  categoryId  String  @map("category_id") @db.Uuid
+  hasSize     Boolean @default(false) @map("has_size")
+  isActive    Boolean @default(true) @map("is_active")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  category   Category         @relation(fields: [categoryId], references: [id])
+  images     ProductImage[]
+  variants   ProductVariant[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([sku])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(uuid()) @db.Uuid
+  productId String  @map("product_id") @db.Uuid
+  url       String
+  order     Int     @default(0)
+  isMain    Boolean @default(false) @map("is_main")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+// ============================================
+// VARIANT (Color + Size)
+// ============================================
+
+model Color {
+  id       String  @id @default(uuid()) @db.Uuid
+  code     String  @unique // "RED", "NAVY_BLUE"
+  nameTh   String  @map("name_th") // "แดง"
+  nameEn   String  @map("name_en") // "Red"
+  hexCode  String  @map("hex_code") // "#FF0000"
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  variants ProductVariant[]
+
+  @@index([code])
+  @@map("colors")
+}
+
+model ProductVariant {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  sku       String   @unique // "SHIRT-RED-M"
+  colorId   String   @map("color_id") @db.Uuid
+  size      String? // nullable
+  price     Decimal? @db.Decimal(10, 2) // nullable — ถ้า null ใช้ basePrice
+  imageUrl  String?  @map("image_url")
+  isActive  Boolean  @default(true) @map("is_active")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  color      Color       @relation(fields: [colorId], references: [id])
+  inventory  Inventory?
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@unique([productId, colorId, size]) // กันซ้ำ
+  @@index([productId])
+  @@index([colorId])
+  @@index([sku])
+  @@map("product_variants")
+}
+
+// ============================================
+// INVENTORY
+// ============================================
+
+model Inventory {
+  id          String @id @default(uuid()) @db.Uuid
+  variantId   String @unique @map("variant_id") @db.Uuid
+  quantity    Int    @default(0)
+  reservedQty Int    @default(0) @map("reserved_qty")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  logs    InventoryLog[]
+
+  @@index([variantId])
+  @@map("inventories")
+}
+
+model InventoryLog {
+  id          String          @id @default(uuid()) @db.Uuid
+  inventoryId String          @map("inventory_id") @db.Uuid
+  delta       Int // +/- จำนวน
+  reason      InventoryReason
+  note        String?
+  referenceId String?         @map("reference_id") // orderId หรือ cartId
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryId])
+  @@index([createdAt])
+  @@map("inventory_logs")
+}
+
+// ============================================
+// CUSTOMER ADDRESS
+// ============================================
+
+model Address {
+  id          String  @id @default(uuid()) @db.Uuid
+  customerId  String  @map("customer_id") @db.Uuid
+  label       String? // "บ้าน", "ที่ทำงาน"
+  fullName    String  @map("full_name")
+  phone       String
+  addressLine String  @map("address_line")
+  subDistrict String  @map("sub_district") // ตำบล/แขวง
+  district    String // อำเภอ/เขต
+  province    String // จังหวัด/แขวง
+  postalCode  String  @map("postal_code")
+  isDefault   Boolean @default(false) @map("is_default")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  customer       Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  shippingOrders Order[]  @relation("OrderShippingAddress")
+
+  @@index([customerId])
+  @@map("addresses")
+}
+
+// ============================================
+// CART
+// ============================================
+
+model Cart {
+  id         String @id @default(uuid()) @db.Uuid
+  customerId String @unique @map("customer_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  customer Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items    CartItem[]
+
+  @@index([customerId])
+  @@map("carts")
+}
+
+model CartItem {
+  id        String @id @default(uuid()) @db.Uuid
+  cartId    String @map("cart_id") @db.Uuid
+  productId String @map("product_id") @db.Uuid
+  variantId String @map("variant_id") @db.Uuid
+  quantity  Int    @default(1)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  cart    Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product        @relation(fields: [productId], references: [id])
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+
+  @@unique([cartId, variantId]) // 1 cart มี 1 variant ซ้ำไม่ได้
+  @@index([cartId])
+  @@index([variantId])
+  @@map("cart_items")
+}
+
+// ============================================
+// ORDER
+// ============================================
+
+model Order {
+  id          String      @id @default(uuid()) @db.Uuid
+  orderNumber String      @unique @map("order_number") // "ORD-20260419-0001"
+  customerId  String      @map("customer_id") @db.Uuid
+  status      OrderStatus @default(PENDING)
+
+  // ราคาแยกย่อย
+  subtotal    Decimal @db.Decimal(10, 2)
+  shippingFee Decimal @default(0) @map("shipping_fee") @db.Decimal(10, 2)
+  discount    Decimal @default(0) @db.Decimal(10, 2)
+  totalAmount Decimal @map("total_amount") @db.Decimal(10, 2)
+
+  // Shipping
+  shippingAddressId String @map("shipping_address_id") @db.Uuid
+
+  // Snapshot shipping (เผื่อลูกค้าลบ address)
+  shippingName    String @map("shipping_name")
+  shippingPhone   String @map("shipping_phone")
+  shippingAddress String @map("shipping_address") @db.Text
+
+  note String? @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  customer    Customer      @relation(fields: [customerId], references: [id])
+  address     Address       @relation("OrderShippingAddress", fields: [shippingAddressId], references: [id])
+  items       OrderItem[]
+  transaction Transactions? // 1:1 — 1 order มีได้ 1 transaction
+  shipment    Shipment?
+
+  @@index([customerId])
+  @@index([orderNumber])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(uuid()) @db.Uuid
+  orderId   String @map("order_id") @db.Uuid
+  productId String @map("product_id") @db.Uuid
+  variantId String @map("variant_id") @db.Uuid
+
+  // Snapshot (สำคัญมาก!)
+  productName  String  @map("product_name") // ชื่อตอนซื้อ
+  productImage String? @map("product_image") // รูปตอนซื้อ
+  variantSku   String  @map("variant_sku") // SKU ตอนซื้อ
+  colorName    String  @map("color_name") // สีตอนซื้อ
+  size         String? // size ตอนซื้อ
+
+  quantity  Int
+  unitPrice Decimal @map("unit_price") @db.Decimal(10, 2)
+  subtotal  Decimal @db.Decimal(10, 2) // unitPrice * quantity
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product        @relation(fields: [productId], references: [id])
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+// ============================================
+// TRANSACTIONS (เดิม + เชื่อม Order แบบ 1:1)
+// ============================================
+
 model Transactions {
   id             String   @id @default(uuid()) @db.Uuid
   transaction_id String   @map("transaction_id")
   merchant_id    String   @map("merchant_id")
-  order_id       String   @map("order_id")
+  order_id       String   @map("order_id") // รหัส order จาก merchant (string เดิม)
   merchant_name  String   @map("merchant_name")
   amount         Float
   status         Status
-  created_at     DateTime @default(now()) @map("created_at")
-  updated_at     DateTime @updatedAt @map("updated_at")
   post_request   String   @map("post_request")
   bank_request   String   @map("bank_request")
   bank_response  String   @map("bank_response")
   bank_type      BankType
 
+  // Phase 1 — QR slip + COD
+  paymentMethod PaymentMethod @default(QR) @map("payment_method")
+  slipUrl       String?       @map("slip_url") // รูปสลิปที่ลูกค้าแนบ (QR เท่านั้น)
+
+  // เชื่อมกับ Order (1:1)
+  orderRef String @unique @map("order_ref") @db.Uuid
+  order    Order  @relation(fields: [orderRef], references: [id])
+
+  // Audit — ใครเป็นคน verify (optional สำหรับ manual verify)
+  verifiedBy String?   @map("verified_by") @db.Uuid
+  verifiedAt DateTime? @map("verified_at")
+  verifier   Admin?    @relation("TransactionVerifier", fields: [verifiedBy], references: [id])
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+
+  @@index([orderRef])
+  @@index([transaction_id])
+  @@index([status])
   @@map("transactions")
+}
+
+// ============================================
+// SHIPPING
+// ============================================
+
+model Shipment {
+  id             String         @id @default(uuid()) @db.Uuid
+  orderId        String         @unique @map("order_id") @db.Uuid
+  trackingNumber String?        @map("tracking_number")
+  carrier        String? // "Kerry", "Flash", "EMS"
+  status         ShipmentStatus @default(PREPARING)
+  shippedAt      DateTime?      @map("shipped_at")
+  deliveredAt    DateTime?      @map("delivered_at")
+  note           String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([trackingNumber])
+  @@map("shipments")
 }
