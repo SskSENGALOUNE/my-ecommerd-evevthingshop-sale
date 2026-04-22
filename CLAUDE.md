@@ -3,6 +3,7 @@
 ## Business Overview
 
 ร้านค้าออนไลน์ขายของใช้ เจ้าของร้านคนเดียว บริหารโดย Admin
+Project นี้ใช้พาสา ลาว(Lao) front Notosanslao
 รองรับ Multi-Admin ในอนาคต แต่ปัจจุบันใช้ Role-based access control เตรียมไว้
 
 ---
