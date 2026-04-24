@@ -7,6 +7,7 @@ import { ApplicationModule } from './application/application.module';
 import { SharedModule } from './shared/shared.module';
 import { HealthService } from './utilities/health-check/health.service';
 
+
 @Module({
   imports: [
     SharedModule,
@@ -17,4 +18,4 @@ import { HealthService } from './utilities/health-check/health.service';
   controllers: [AppController],
   providers: [AppService, HealthService],
 })
-export class AppModule {}
+export class AppModule { }

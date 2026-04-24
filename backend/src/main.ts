@@ -11,14 +11,22 @@ import { AppModule } from './app.module';
 import { LoggingInterceptor, nestLogger } from './utilities/interceptor/logger';
 import { BaseResponseInterceptor } from './presentation/interceptors/base-response.interceptor';
 import { BaseErrorInterceptor } from './presentation/interceptors/base-error.interceptor';
+import { TimeoutInterceptor } from './presentation/interceptors/timeout.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,         // ตัด field ที่ไม่ได้กำหนดใน DTO ออก
+    forbidNonWhitelisted: true, // ส่ง field แปลกมา = error
+    transform: true,         // แปลง type อัตโนมัติ
+  }));
+
 
   app.useGlobalInterceptors(
     new LoggingInterceptor({ serviceName: 'payment-center' }),
     new BaseResponseInterceptor(),
     new BaseErrorInterceptor(),
+    new TimeoutInterceptor(),
   );
   // Enable validation globally
   app.useGlobalPipes(

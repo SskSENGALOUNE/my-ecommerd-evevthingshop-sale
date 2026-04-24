@@ -32,7 +32,7 @@ enum BankType {
 }
 
 enum PaymentMethod {
-  QR  // โอนผ่าน QR + แนบสลิป
+  QR // โอนผ่าน QR + แนบสลิป
   COD // เก็บเงินปลายทาง
 }
 
@@ -121,26 +121,36 @@ model ExTable {
 }
 
 // ============================================
-// PRODUCT
+// BANNER
 // ============================================
-
-model Category {
+model Banner {
   id       String  @id @default(uuid()) @db.Uuid
-  name     String
-  slug     String  @unique
-  parentId String? @map("parent_id") @db.Uuid
+  title    String
+  imageUrl String  @map("image_url")
+  linkUrl  String? @map("link_url")
+  isActive Boolean @default(true) @map("is_active")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  // Self-relation สำหรับ sub-category
-  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
-  children Category[] @relation("CategoryTree")
+  @@index([isActive])
+  @@map("banners")
+}
+
+// ============================================
+// PRODUCT
+// ============================================
+model Category {
+  id   String @id @default(uuid()) @db.Uuid
+  name String
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   products Product[]
 
-  @@index([slug])
-  @@index([parentId])
   @@map("categories")
 }
 
