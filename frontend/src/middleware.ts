@@ -7,32 +7,53 @@ const ADMIN_PROTECTED = "/admin";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Admin routes — check admin token
+  // ====== ADMIN ROUTES ======
   if (pathname.startsWith(ADMIN_PROTECTED)) {
+    // ไม่ดัก /admin/login
+    if (pathname === "/admin/login") {
+      return NextResponse.next();
+    }
+
     const adminToken = request.cookies.get("admin_token")?.value;
+
     if (!adminToken) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
+
+    return NextResponse.next();
   }
 
-  // Customer protected routes — check customer token
+  // ====== CUSTOMER PROTECTED ROUTES ======
   const isCustomerProtected = CUSTOMER_PROTECTED.some((route) =>
     pathname.startsWith(route)
   );
+
   if (isCustomerProtected) {
-    const customerToken = request.cookies.get("auth_token")?.value;
+    const customerToken = request.cookies.get("customer_token")?.value;
+
     if (!customerToken) {
+      // ไม่มี token → ส่งไป login page (customer role)
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
+
+    // มี token → ให้ผ่าน
+    return NextResponse.next();
   }
 
+  // ====== PUBLIC ROUTES ======
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/cart/:path*", "/checkout/:path*", "/orders/:path*", "/account/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/cart/:path*",
+    "/checkout/:path*",
+    "/orders/:path*",
+    "/account/:path*",
+  ],
 };

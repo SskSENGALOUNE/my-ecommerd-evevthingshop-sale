@@ -4,6 +4,7 @@ import { Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/auth-store";
 import { useRouter } from "next/navigation";
+import { logoutAdmin } from "@/lib/api/auth";
 
 interface TopbarProps {
   onMenuClick: () => void;
@@ -15,8 +16,12 @@ export function AdminTopbar({ onMenuClick }: TopbarProps) {
   const router = useRouter();
 
   const handleLogout = () => {
+    // ລົບ store
     adminLogout();
-    router.push("/login");
+    // ລົບ localStorage ແລະ cookies
+    logoutAdmin();
+    // ກັບໄປ login page
+    router.push("/login?role=admin");
   };
 
   return (

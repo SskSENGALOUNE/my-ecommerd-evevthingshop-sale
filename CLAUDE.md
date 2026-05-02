@@ -21,61 +21,63 @@ my-ecommerd-evevthing-shop/
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | NestJS 11, TypeScript, Clean Architecture + CQRS |
-| Frontend | Next.js (App Router), TypeScript |
-| Database | PostgreSQL 15 (via Prisma ORM) |
-| Auth | JWT (separate tokens for customer / admin) |
-| Messaging | Kafka (async events) |
-| Containerization | Docker + Docker Compose |
+| Layer            | Technology                                       |
+| ---------------- | ------------------------------------------------ |
+| Backend          | NestJS 11, TypeScript, Clean Architecture + CQRS |
+| Frontend         | Next.js (App Router), TypeScript                 |
+| Database         | PostgreSQL 15 (via Prisma ORM)                   |
+| Auth             | JWT (separate tokens for customer / admin)       |
+| Messaging        | Kafka (async events)                             |
+| Containerization | Docker + Docker Compose                          |
 
 ---
 
 ## Domain Modules
 
-| Module | Description |
-|--------|-------------|
-| `auth` | Login/register สำหรับ customer และ admin |
-| `admin` | จัดการ admin หลายคน + permissions |
-| `product` | สินค้า, หมวดหมู่, รูปภาพ |
-| `inventory` | สต็อกสินค้า |
-| `customer` | ข้อมูลลูกค้า, ที่อยู่จัดส่ง |
-| `cart` | ตะกร้าสินค้า |
-| `order` | คำสั่งซื้อ, สถานะ order |
-| `payment` | QR (admin verify manual), COD |
-| `shipping` | การจัดส่ง, tracking status |
+| Module      | Description                              |
+| ----------- | ---------------------------------------- |
+| `auth`      | Login/register สำหรับ customer และ admin |
+| `admin`     | จัดการ admin หลายคน + permissions        |
+| `product`   | สินค้า, หมวดหมู่, รูปภาพ                 |
+| `inventory` | สต็อกสินค้า                              |
+| `customer`  | ข้อมูลลูกค้า, ที่อยู่จัดส่ง              |
+| `cart`      | ตะกร้าสินค้า                             |
+| `order`     | คำสั่งซื้อ, สถานะ order                  |
+| `payment`   | QR (admin verify manual), COD            |
+| `shipping`  | การจัดส่ง, tracking status               |
 
 ---
 
 ## Payment Phases
 
 ### Phase 1 (ปัจจุบัน)
+
 - **QR Payment** — ลูกค้าโอน → แนบสลิป → admin อนุมัติ manual
 - **COD** — เก็บเงินปลายทาง
 
 ### Phase 2 (อนาคต)
+
 - **Payment Gateway** — Omise / 2C2P (ยังไม่ตัดสินใจ)
 
 ---
 
 ## User Roles
 
-| Role | สิทธิ์ |
-|------|--------|
+| Role          | สิทธิ์                            |
+| ------------- | --------------------------------- |
 | `SUPER_ADMIN` | จัดการ admin คนอื่น + ทุก feature |
-| `ADMIN` | จัดการสินค้า, order, payment |
-| `CUSTOMER` | ซื้อสินค้า, ดู order ตัวเอง |
+| `ADMIN`       | จัดการสินค้า, order, payment      |
+| `CUSTOMER`    | ซื้อสินค้า, ดู order ตัวเอง       |
 
 ---
 
 ## Port Map (Development)
 
-| Service | Port |
-|---------|------|
-| Backend API | 3009 |
-| Frontend | 3000 |
-| PostgreSQL | 5433 |
+| Service       | Port |
+| ------------- | ---- |
+| Backend API   | 3009 |
+| Frontend      | 3000 |
+| PostgreSQL    | 5433 |
 | Prisma Studio | 5555 |
 
 ---
