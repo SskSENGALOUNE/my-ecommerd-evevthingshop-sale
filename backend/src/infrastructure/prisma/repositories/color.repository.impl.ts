@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ColorType } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import {
   IColorRepository,
@@ -14,7 +15,7 @@ export class ColorRepositoryImpl implements IColorRepository {
   async create(data: CreateColorData): Promise<ColorData> {
     const color = await this.prisma.color.create({
       data: {
-        color: data.color,
+        color: data.color as ColorType,
         isActive: data.isActive ?? true,
       },
     });
@@ -39,7 +40,7 @@ export class ColorRepositoryImpl implements IColorRepository {
     const color = await this.prisma.color.update({
       where: { id },
       data: {
-        ...(data.color !== undefined && { color: data.color }),
+        ...(data.color !== undefined && { color: data.color as ColorType }),
         ...(data.isActive !== undefined && { isActive: data.isActive }),
       },
     });
@@ -53,8 +54,8 @@ export class ColorRepositoryImpl implements IColorRepository {
   }
 
   async findByColor(color: string): Promise<ColorData | null> {
-    const result = await this.prisma.color.findUnique({
-      where: { color: color as any },
+    const result = await this.prisma.color.findFirst({
+      where: { color: color as ColorType },
     });
     return result ? this.mapToColorData(result) : null;
   }

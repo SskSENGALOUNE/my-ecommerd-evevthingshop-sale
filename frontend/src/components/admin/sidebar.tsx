@@ -10,6 +10,7 @@ import {
   Truck,
   Warehouse,
   Users,
+  Image,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ interface SidebarProps {
 const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "ສິນຄ້າ", icon: Package },
+  { href: "/admin/banners", label: "Banner", icon: Image },
   { href: "/admin/orders", label: "ຄຳສັ່ງຊື້", icon: ShoppingBag },
   { href: "/admin/payments", label: "ຊຳລະເງິນ", icon: CreditCard },
   { href: "/admin/shipping", label: "ຈັດສົ່ງ", icon: Truck },

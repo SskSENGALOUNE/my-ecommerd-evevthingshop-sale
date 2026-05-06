@@ -22,7 +22,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "test:arch": "depcruise --config dependency-cruiser.js src"
+    "test:arch": "depcruise --config dependency-cruiser.js src",
+    "seed:colors": "ts-node prisma/seed.color.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

@@ -6,9 +6,10 @@ import { TransactionModule } from './transaction/transaction.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { ColorModule } from './color/color.module';
+import { BannerModule } from './banner/banner.module';
 
 @Module({
-  imports: [CqrsModule, ApplicationModule, ExTableModule, TransactionModule, AuthModule, CategoryModule, ColorModule],
-  exports: [ExTableModule, CategoryModule, ColorModule],
+  imports: [CqrsModule, ApplicationModule, ExTableModule, TransactionModule, AuthModule, CategoryModule, ColorModule, BannerModule],
+  exports: [ExTableModule, CategoryModule, ColorModule, BannerModule],
 })
 export class PresentationModule { }

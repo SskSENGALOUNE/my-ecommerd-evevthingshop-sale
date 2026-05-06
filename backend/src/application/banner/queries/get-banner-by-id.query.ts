@@ -1,3 +1,3 @@
-export class DeleteBannerCommand {
+export class GetBannerByIdQuery {
   constructor(public readonly id: string) {}
 }

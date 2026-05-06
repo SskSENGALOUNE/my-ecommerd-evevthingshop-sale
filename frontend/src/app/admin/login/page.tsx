@@ -10,8 +10,12 @@ export default function AdminLoginPage() {
 
   const handleAdminLoginSuccess = (data: any) => {
     const adminData = data.admin;
-    setAdmin(adminData, data.token);
+    const token = data.token;
+    setAdmin(adminData, token);
+    localStorage.setItem("adminToken", token);
     localStorage.setItem("adminData", JSON.stringify(adminData));
+    // Save token to cookie for middleware
+    document.cookie = `admin_token=${token}; path=/; max-age=604800`; // 7 days
     router.push("/admin/dashboard");
   };
 
