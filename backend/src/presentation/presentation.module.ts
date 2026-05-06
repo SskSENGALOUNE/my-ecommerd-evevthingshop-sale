@@ -5,9 +5,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TransactionModule } from './transaction/transaction.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
+import { ColorModule } from './color/color.module';
 
 @Module({
-  imports: [CqrsModule, ApplicationModule, ExTableModule, TransactionModule, AuthModule, CategoryModule],
-  exports: [ExTableModule, CategoryModule],
+  imports: [CqrsModule, ApplicationModule, ExTableModule, TransactionModule, AuthModule, CategoryModule, ColorModule],
+  exports: [ExTableModule, CategoryModule, ColorModule],
 })
 export class PresentationModule { }

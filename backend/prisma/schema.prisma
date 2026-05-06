@@ -19,6 +19,22 @@ enum AdminRole {
   ADMIN
 }
 
+enum ColorType {
+  RED
+  GREEN
+  BLUE
+  YELLOW
+  BLACK
+  WHITE
+  GRAY
+  PURPLE
+  ORANGE
+  PINK
+  BROWN
+  GOLD
+  SILVER
+}
+
 enum Status {
   PENDING
   COMPLETED
@@ -29,6 +45,14 @@ enum BankType {
   BCEL
   JDB
   LDB
+}
+
+enum ShippingType {
+  RAIDER
+  ANOUSITH_EXPRESS
+  HOUNGALOUN_EXPRESS
+  MIXAY_EXPRESS
+  UNITEL_EXPRESS
 }
 
 enum PaymentMethod {
@@ -52,15 +76,6 @@ enum ShipmentStatus {
   DELIVERED
 }
 
-enum InventoryReason {
-  PURCHASE // รับของเข้า
-  SALE // ขายออก
-  ADJUSTMENT // ปรับสต็อก manual
-  RETURN // คืนสินค้า
-  RESERVATION // จอง (ใส่ตะกร้า/checkout)
-  RESERVATION_RELEASE // ปล่อยจอง (timeout/cancel)
-}
-
 // ============================================
 // AUTH
 // ============================================
@@ -79,6 +94,7 @@ model Admin {
 
   // Relations
   verifiedTransactions Transactions[] @relation("TransactionVerifier")
+  auditLogs           AuditLog[]      @relation("AdminAuditLogs")
 
   @@index([email])
   @@map("admins")
@@ -155,15 +171,15 @@ model Category {
 }
 
 model Product {
-  id          String  @id @default(uuid()) @db.Uuid
-  name        String
-  slug        String  @unique
-  description String? @db.Text
-  basePrice   Decimal @map("base_price") @db.Decimal(10, 2)
-  sku         String  @unique
-  categoryId  String  @map("category_id") @db.Uuid
-  hasSize     Boolean @default(false) @map("has_size")
-  isActive    Boolean @default(true) @map("is_active")
+  id         String  @id @default(uuid()) @db.Uuid
+  name       String
+  basePrice  Decimal @map("base_price") @db.Decimal(10, 2)
+  categoryId String  @map("category_id") @db.Uuid
+  isActive   Boolean @default(true) @map("is_active")
+
+  // Inventory
+  quantity    Int @default(0)
+  reservedQty Int @default(0) @map("reserved_qty")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -176,9 +192,7 @@ model Product {
   cartItems  CartItem[]
   orderItems OrderItem[]
 
-  @@index([slug])
   @@index([categoryId])
-  @@index([sku])
   @@map("products")
 }
 
@@ -202,19 +216,16 @@ model ProductImage {
 // ============================================
 
 model Color {
-  id       String  @id @default(uuid()) @db.Uuid
-  code     String  @unique // "RED", "NAVY_BLUE"
-  nameTh   String  @map("name_th") // "แดง"
-  nameEn   String  @map("name_en") // "Red"
-  hexCode  String  @map("hex_code") // "#FF0000"
-  isActive Boolean @default(true) @map("is_active")
+  id       String    @id @default(uuid()) @db.Uuid
+  color    ColorType
+  isActive Boolean   @default(true) @map("is_active")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   variants ProductVariant[]
 
-  @@index([code])
+  @@index([color])
   @@map("colors")
 }
 
@@ -235,7 +246,6 @@ model ProductVariant {
   // Relations
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   color      Color       @relation(fields: [colorId], references: [id])
-  inventory  Inventory?
   cartItems  CartItem[]
   orderItems OrderItem[]
 
@@ -247,57 +257,17 @@ model ProductVariant {
 }
 
 // ============================================
-// INVENTORY
-// ============================================
-
-model Inventory {
-  id          String @id @default(uuid()) @db.Uuid
-  variantId   String @unique @map("variant_id") @db.Uuid
-  quantity    Int    @default(0)
-  reservedQty Int    @default(0) @map("reserved_qty")
-
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  logs    InventoryLog[]
-
-  @@index([variantId])
-  @@map("inventories")
-}
-
-model InventoryLog {
-  id          String          @id @default(uuid()) @db.Uuid
-  inventoryId String          @map("inventory_id") @db.Uuid
-  delta       Int // +/- จำนวน
-  reason      InventoryReason
-  note        String?
-  referenceId String?         @map("reference_id") // orderId หรือ cartId
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-
-  @@index([inventoryId])
-  @@index([createdAt])
-  @@map("inventory_logs")
-}
-
-// ============================================
 // CUSTOMER ADDRESS
 // ============================================
 
 model Address {
-  id          String  @id @default(uuid()) @db.Uuid
-  customerId  String  @map("customer_id") @db.Uuid
-  label       String? // "บ้าน", "ที่ทำงาน"
-  fullName    String  @map("full_name")
-  phone       String
-  addressLine String  @map("address_line")
-  subDistrict String  @map("sub_district") // ตำบล/แขวง
-  district    String // อำเภอ/เขต
-  province    String // จังหวัด/แขวง
-  postalCode  String  @map("postal_code")
-  isDefault   Boolean @default(false) @map("is_default")
+  id         String  @id @default(uuid()) @db.Uuid
+  customerId String  @map("customer_id") @db.Uuid
+  label      String? // "บ้าน", "ที่ทำงาน"
+
+  address String @map("address")
+
+  isDefault Boolean @default(false) @map("is_default")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -332,19 +302,17 @@ model CartItem {
   id        String @id @default(uuid()) @db.Uuid
   cartId    String @map("cart_id") @db.Uuid
   productId String @map("product_id") @db.Uuid
-  variantId String @map("variant_id") @db.Uuid
   quantity  Int    @default(1)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  cart    Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product Product        @relation(fields: [productId], references: [id])
-  variant ProductVariant @relation(fields: [variantId], references: [id])
+  cart             Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product          Product         @relation(fields: [productId], references: [id])
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id])
+  productVariantId String?         @db.Uuid
 
-  @@unique([cartId, variantId]) // 1 cart มี 1 variant ซ้ำไม่ได้
   @@index([cartId])
-  @@index([variantId])
   @@map("cart_items")
 }
 
@@ -359,8 +327,6 @@ model Order {
   status      OrderStatus @default(PENDING)
 
   // ราคาแยกย่อย
-  subtotal    Decimal @db.Decimal(10, 2)
-  shippingFee Decimal @default(0) @map("shipping_fee") @db.Decimal(10, 2)
   discount    Decimal @default(0) @db.Decimal(10, 2)
   totalAmount Decimal @map("total_amount") @db.Decimal(10, 2)
 
@@ -368,11 +334,7 @@ model Order {
   shippingAddressId String @map("shipping_address_id") @db.Uuid
 
   // Snapshot shipping (เผื่อลูกค้าลบ address)
-  shippingName    String @map("shipping_name")
-  shippingPhone   String @map("shipping_phone")
-  shippingAddress String @map("shipping_address") @db.Text
-
-  note String? @db.Text
+  shippingName ShippingType
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -382,7 +344,6 @@ model Order {
   address     Address       @relation("OrderShippingAddress", fields: [shippingAddressId], references: [id])
   items       OrderItem[]
   transaction Transactions? // 1:1 — 1 order มีได้ 1 transaction
-  shipment    Shipment?
 
   @@index([customerId])
   @@index([orderNumber])
@@ -395,13 +356,12 @@ model OrderItem {
   id        String @id @default(uuid()) @db.Uuid
   orderId   String @map("order_id") @db.Uuid
   productId String @map("product_id") @db.Uuid
-  variantId String @map("variant_id") @db.Uuid
 
   // Snapshot (สำคัญมาก!)
-  productName  String  @map("product_name") // ชื่อตอนซื้อ
-  productImage String? @map("product_image") // รูปตอนซื้อ
-  variantSku   String  @map("variant_sku") // SKU ตอนซื้อ
-  colorName    String  @map("color_name") // สีตอนซื้อ
+  productName  String    @map("product_name") // ชื่อตอนซื้อ
+  productImage String?   @map("product_image") // รูปตอนซื้อ
+  variantSku   String    @map("variant_sku") // SKU ตอนซื้อ
+  colorName    ColorType @map("color_name") // สีตอนซื้อ
   size         String? // size ตอนซื้อ
 
   quantity  Int
@@ -410,9 +370,10 @@ model OrderItem {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product        @relation(fields: [productId], references: [id])
-  variant ProductVariant @relation(fields: [variantId], references: [id])
+  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product          Product         @relation(fields: [productId], references: [id])
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id])
+  productVariantId String?         @db.Uuid
 
   @@index([orderId])
   @@index([productId])
@@ -452,32 +413,32 @@ model Transactions {
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
 
-  @@index([orderRef])
   @@index([transaction_id])
+  @@index([orderRef])
   @@index([status])
   @@map("transactions")
 }
 
 // ============================================
-// SHIPPING
+// AUDIT LOG
 // ============================================
 
-model Shipment {
-  id             String         @id @default(uuid()) @db.Uuid
-  orderId        String         @unique @map("order_id") @db.Uuid
-  trackingNumber String?        @map("tracking_number")
-  carrier        String? // "Kerry", "Flash", "EMS"
-  status         ShipmentStatus @default(PREPARING)
-  shippedAt      DateTime?      @map("shipped_at")
-  deliveredAt    DateTime?      @map("delivered_at")
-  note           String?
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  adminId   String   @map("admin_id") @db.Uuid
+  action    String   // CREATE, UPDATE, DELETE
+  tableName String   @map("table_name")
+  recordId  String   @map("record_id")
+  oldValue  Json?    @map("old_value")
+  newValue  Json?    @map("new_value")
+  note      String?
 
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
 
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  admin Admin @relation("AdminAuditLogs", fields: [adminId], references: [id], onDelete: Cascade)
 
-  @@index([orderId])
-  @@index([trackingNumber])
-  @@map("shipments")
+  @@index([adminId])
+  @@index([tableName])
+  @@index([createdAt])
+  @@map("audit_logs")
 }
