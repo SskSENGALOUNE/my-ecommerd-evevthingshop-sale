@@ -11,6 +11,7 @@ import {
   Warehouse,
   Users,
   Image,
+  Tag,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "ສິນຄ້າ", icon: Package },
   { href: "/admin/banners", label: "Banner", icon: Image },
+  { href: "/admin/categories", label: "ໝວດໝູ່", icon: Tag },
   { href: "/admin/orders", label: "ຄຳສັ່ງຊື້", icon: ShoppingBag },
   { href: "/admin/payments", label: "ຊຳລະເງິນ", icon: CreditCard },
   { href: "/admin/shipping", label: "ຈັດສົ່ງ", icon: Truck },
@@ -48,7 +50,7 @@ export function AdminSidebar({ open, onClose }: SidebarProps) {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar transition-transform lg:static lg:translate-x-0",
-          open ? "translate-x-0" : "-translate-x-full"
+          open ? "translate-x-0" : "-translate-x-full",
         )}
       >
         {/* Logo */}
@@ -80,7 +82,7 @@ export function AdminSidebar({ open, onClose }: SidebarProps) {
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       isActive
                         ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                     )}
                   >
                     <item.icon className="size-5" />

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { getAdminToken } from "@/lib/api/auth";
 import { getBanners, deleteBanner, Banner } from "@/lib/api/banner";
-import { Plus, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Eye, EyeOff } from "lucide-react";
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -85,9 +85,10 @@ export default function AdminBannersPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {banners.map((banner) => (
-            <div
+            <Link
               key={banner.id}
-              className="overflow-hidden rounded-lg border bg-card shadow-sm hover:shadow-md transition-shadow"
+              href={`/admin/banners/${banner.id}/edit`}
+              className="overflow-hidden rounded-lg border bg-card shadow-sm hover:shadow-md transition-shadow block"
             >
               {/* Banner Image */}
               <div className="relative h-40 bg-muted overflow-hidden">
@@ -130,25 +131,23 @@ export default function AdminBannersPage() {
                   <span className="ml-auto">ລຳດັບ: {banner.order}</span>
                 </div>
 
-                {/* Actions */}
-                <div className="mt-4 flex gap-2">
-                  <Link href={`/admin/banners/${banner.id}/edit`} className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full gap-2">
-                      <Edit2 className="size-4" />
-                      ແກ້ໄຂ
-                    </Button>
-                  </Link>
+                {/* Delete Button */}
+                <div className="mt-4">
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(banner.id)}
-                    className="gap-2"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDelete(banner.id);
+                    }}
+                    className="w-full gap-2"
                   >
                     <Trash2 className="size-4" />
+                    ລົບ
                   </Button>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

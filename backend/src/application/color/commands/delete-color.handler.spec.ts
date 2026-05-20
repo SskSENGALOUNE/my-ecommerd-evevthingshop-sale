@@ -1,9 +1,9 @@
-import { NotFoundException } from '@nestjs/common';
-import { DeleteColorHandler } from './delete-color.handler';
-import { DeleteColorCommand } from './delete-color.command';
-import type { IColorRepository } from '../../../domain/color/color.repository';
+import { NotFoundException } from "@nestjs/common";
+import { DeleteColorHandler } from "./delete-color.handler";
+import { DeleteColorCommand } from "./delete-color.command";
+import type { IColorRepository } from "../../../domain/color/color.repository";
 
-describe('DeleteColorHandler', () => {
+describe("DeleteColorHandler", () => {
   let handler: DeleteColorHandler;
   let repo: jest.Mocked<IColorRepository>;
 
@@ -19,11 +19,11 @@ describe('DeleteColorHandler', () => {
     handler = new DeleteColorHandler(repo);
   });
 
-  it('deletes color when it exists', async () => {
-    const colorId = 'uuid-1';
+  it("deletes color when it exists", async () => {
+    const colorId = "uuid-1";
     repo.findById.mockResolvedValue({
       id: colorId,
-      color: 'RED',
+      color: "RED",
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -35,11 +35,11 @@ describe('DeleteColorHandler', () => {
     expect(repo.delete).toHaveBeenCalledWith(colorId);
   });
 
-  it('throws NotFoundException when color does not exist', async () => {
+  it("throws NotFoundException when color does not exist", async () => {
     repo.findById.mockResolvedValue(null);
 
     await expect(
-      handler.execute(new DeleteColorCommand('uuid-999')),
+      handler.execute(new DeleteColorCommand("uuid-999")),
     ).rejects.toThrow(NotFoundException);
     expect(repo.delete).not.toHaveBeenCalled();
   });

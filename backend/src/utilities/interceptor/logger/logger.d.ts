@@ -1,10 +1,10 @@
-import * as winston from 'winston';
+import * as winston from "winston";
 interface OriginalConsoleMethods {
-    log: typeof console.log;
-    info: typeof console.info;
-    warn: typeof console.warn;
-    error: typeof console.error;
-    debug: typeof console.debug;
+  log: typeof console.log;
+  info: typeof console.info;
+  warn: typeof console.warn;
+  error: typeof console.error;
+  debug: typeof console.debug;
 }
 export declare const iquriLogger: winston.Logger;
 export declare function enableConsoleHijacking(): void;

@@ -1,13 +1,11 @@
-import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
-import { GetTransactionsPaginatedQuery } from './get-transactions-paginated.query';
-import { TRANSECTION_REPOSITORY } from 'src/domain/transaction/transaction.repository';
-import type { TransactionRepository } from 'src/domain/transaction/transaction.repository';
+import { QueryHandler, IQueryHandler } from "@nestjs/cqrs";
+import { Inject } from "@nestjs/common";
+import { GetTransactionsPaginatedQuery } from "./get-transactions-paginated.query";
+import { TRANSECTION_REPOSITORY } from "src/domain/transaction/transaction.repository";
+import type { TransactionRepository } from "src/domain/transaction/transaction.repository";
 
 @QueryHandler(GetTransactionsPaginatedQuery)
-export class GetTransactionsPaginatedHandler
-  implements IQueryHandler<GetTransactionsPaginatedQuery>
-{
+export class GetTransactionsPaginatedHandler implements IQueryHandler<GetTransactionsPaginatedQuery> {
   constructor(
     @Inject(TRANSECTION_REPOSITORY)
     private readonly repository: TransactionRepository,

@@ -1,14 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { ICustomerRepository, CreateCustomerData } from '../../../domain/customer/customer.repository';
-import { Customer } from '../../../domain/customer/customer.entity';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma.service";
+import {
+  ICustomerRepository,
+  CreateCustomerData,
+  OAuthCustomerData,
+} from "../../../domain/customer/customer.repository";
+import { Customer } from "../../../domain/customer/customer.entity";
 
 @Injectable()
 export class CustomerRepositoryImpl implements ICustomerRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   private map(result: any): Customer {
-    return new Customer(result.id, result.email, result.password, result.name, result.phone, result.isActive, result.createdAt, result.updatedAt);
+    return new Customer(
+      result.id,
+      result.email,
+      result.password,
+      result.name,
+      result.phone,
+      result.supabaseId,
+      result.isActive,
+      result.createdAt,
+      result.updatedAt,
+    );
   }
 
   async findByEmail(email: string): Promise<Customer | null> {
@@ -35,6 +49,35 @@ export class CustomerRepositoryImpl implements ICustomerRepository {
         phone: data.phone,
       },
     });
+    return this.map(result);
+  }
+
+  async findOrCreateByOAuth(data: OAuthCustomerData): Promise<Customer> {
+    let result = await this.prisma.customer.findUnique({
+      where: { supabaseId: data.supabaseId },
+    });
+
+    if (!result) {
+      result = await this.prisma.customer.findUnique({
+        where: { email: data.email },
+      });
+
+      if (result) {
+        result = await this.prisma.customer.update({
+          where: { id: result.id },
+          data: { supabaseId: data.supabaseId },
+        });
+      } else {
+        result = await this.prisma.customer.create({
+          data: {
+            email: data.email,
+            name: data.name,
+            supabaseId: data.supabaseId,
+          },
+        });
+      }
+    }
+
     return this.map(result);
   }
 }

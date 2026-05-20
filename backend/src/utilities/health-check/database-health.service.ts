@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
-import { DatabaseEngine } from './db-engine';
-import { DbHealthResult } from './db-health-result';
-import { detectDatabaseEngines } from '../health-check/detect-db-engine';
-import { PostgresHealthAdapter } from './postgres.adapter';
-import { MysqlHealthAdapter } from './mysql.adapter';
-import { SqlServerHealthAdapter } from './sqlserver.adapter';
-import { MongoHealthAdapter } from './mongo.adapter';
-import { DatabaseHealthPort } from './database-health.port';
+import { Injectable } from "@nestjs/common";
+import { DataSource } from "typeorm";
+import { DatabaseEngine } from "./db-engine";
+import { DbHealthResult } from "./db-health-result";
+import { detectDatabaseEngines } from "../health-check/detect-db-engine";
+import { PostgresHealthAdapter } from "./postgres.adapter";
+import { MysqlHealthAdapter } from "./mysql.adapter";
+import { SqlServerHealthAdapter } from "./sqlserver.adapter";
+import { MongoHealthAdapter } from "./mongo.adapter";
+import { DatabaseHealthPort } from "./database-health.port";
 
 @Injectable()
 export class DatabaseHealthService implements DatabaseHealthPort {
@@ -22,31 +22,23 @@ export class DatabaseHealthService implements DatabaseHealthPort {
         case DatabaseEngine.POSTGRES: {
           const adapter = new PostgresHealthAdapter(this.dataSource);
           const result = await adapter.check();
-          results.push(result as DbHealthResult);
+          results.push(result);
           break;
         }
 
         case DatabaseEngine.MYSQL:
-          results.push(
-            (await new MysqlHealthAdapter(
-              this.dataSource,
-            ).check()) as DbHealthResult,
-          );
+          results.push(await new MysqlHealthAdapter(this.dataSource).check());
           break;
 
         case DatabaseEngine.SQLSERVER:
           results.push(
-            (await new SqlServerHealthAdapter(
-              this.dataSource,
-            ).check()) as DbHealthResult,
+            await new SqlServerHealthAdapter(this.dataSource).check(),
           );
           break;
 
         case DatabaseEngine.MONGO:
           results.push(
-            (await new MongoHealthAdapter(
-              process.env.DATABASE_URL!,
-            ).check()) as DbHealthResult,
+            await new MongoHealthAdapter(process.env.DATABASE_URL!).check(),
           );
           break;
 

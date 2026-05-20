@@ -25,4 +25,4 @@ export interface ColorData {
   updatedAt: Date;
 }
 
-export const COLOR_REPOSITORY = Symbol('COLOR_REPOSITORY');
+export const COLOR_REPOSITORY = Symbol("COLOR_REPOSITORY");

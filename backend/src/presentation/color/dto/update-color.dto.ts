@@ -1,10 +1,10 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsBoolean } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsOptional, IsString, IsBoolean } from "class-validator";
 
 export class UpdateColorDto {
   @ApiPropertyOptional({
-    example: 'BLUE',
-    description: 'Color name (enum value)',
+    example: "BLUE",
+    description: "Color name (enum value)",
   })
   @IsOptional()
   @IsString()
@@ -12,7 +12,7 @@ export class UpdateColorDto {
 
   @ApiPropertyOptional({
     example: true,
-    description: 'Is color active',
+    description: "Is color active",
   })
   @IsOptional()
   @IsBoolean()

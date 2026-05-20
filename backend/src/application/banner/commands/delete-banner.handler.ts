@@ -1,12 +1,10 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException } from '@nestjs/common';
-import { DeleteBannerCommand } from './delete-banner.command';
-import * as bannerRepository from '../../../domain/banner/banner.repository';
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { Inject, NotFoundException } from "@nestjs/common";
+import { DeleteBannerCommand } from "./delete-banner.command";
+import * as bannerRepository from "../../../domain/banner/banner.repository";
 
 @CommandHandler(DeleteBannerCommand)
-export class DeleteBannerHandler
-  implements ICommandHandler<DeleteBannerCommand>
-{
+export class DeleteBannerHandler implements ICommandHandler<DeleteBannerCommand> {
   constructor(
     @Inject(bannerRepository.BANNER_REPOSITORY)
     private readonly repository: bannerRepository.IBannerRepository,

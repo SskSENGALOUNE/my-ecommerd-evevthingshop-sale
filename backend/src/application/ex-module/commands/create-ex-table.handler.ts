@@ -1,9 +1,9 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
-import { CreateExTableCommand } from './create-ex-table.command';
-import * as exTableRepository from '../../../domain/ex-module/ex-table.repository';
-import { ExTable } from '../../../domain/ex-module/ex-table.entity';
-import { BaseCommandResult } from '../../common/base-command-result';
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { Inject } from "@nestjs/common";
+import { CreateExTableCommand } from "./create-ex-table.command";
+import * as exTableRepository from "../../../domain/ex-module/ex-table.repository";
+import { ExTable } from "../../../domain/ex-module/ex-table.entity";
+import { BaseCommandResult } from "../../common/base-command-result";
 
 @CommandHandler(CreateExTableCommand)
 export class CreateExTableHandler implements ICommandHandler<CreateExTableCommand> {

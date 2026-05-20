@@ -1,7 +1,7 @@
 // infrastructure/http/axios-http-client.adapter.ts
-import { Logger } from '@nestjs/common';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { HttpClient } from '../../application/ports/http-client.port';
+import { Logger } from "@nestjs/common";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { HttpClient } from "../../application/ports/http-client.port";
 
 export class AxiosHttpClientAdapter implements HttpClient {
   private readonly axios: AxiosInstance;

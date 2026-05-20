@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma.service";
 import {
   IExTableRepository,
   CreateExTableData,
   UpdateExTableData,
   ExTableData,
-} from '../../../domain/ex-module/ex-table.repository';
+} from "../../../domain/ex-module/ex-table.repository";
 
 @Injectable()
 export class ExTableRepositoryImpl implements IExTableRepository {
@@ -35,19 +35,21 @@ export class ExTableRepositoryImpl implements IExTableRepository {
       where: { id },
     });
 
-    return result ? {
-      id: result.id,
-      name: result.name,
-      createdAt: result.createdAt,
-      createdBy: result.createdBy,
-      updatedAt: result.updatedAt,
-      updatedBy: result.updatedBy,
-    } : null;
+    return result
+      ? {
+          id: result.id,
+          name: result.name,
+          createdAt: result.createdAt,
+          createdBy: result.createdBy,
+          updatedAt: result.updatedAt,
+          updatedBy: result.updatedBy,
+        }
+      : null;
   }
 
   async findAll(): Promise<ExTableData[]> {
     const results = await this.prisma.exTable.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return results.map((result) => ({

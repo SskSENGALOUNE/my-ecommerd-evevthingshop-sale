@@ -1,7 +1,7 @@
 // postgres.strategy.ts
-import { DataSource } from 'typeorm';
-import { DbHealthChecker } from './db-health-checker.port';
-import { DbHealthResult } from './db-health-result';
+import { DataSource } from "typeorm";
+import { DbHealthChecker } from "./db-health-checker.port";
+import { DbHealthResult } from "./db-health-result";
 
 export class PostgresHealthAdapter implements DbHealthChecker {
   constructor(private readonly ds: DataSource) {}
@@ -24,8 +24,8 @@ export class PostgresHealthAdapter implements DbHealthChecker {
       await qr.rollbackTransaction();
 
       return {
-        engine: 'postgres',
-        status: 'ok',
+        engine: "postgres",
+        status: "ok",
         permissions: {
           select: true,
           insert: true,
@@ -35,7 +35,7 @@ export class PostgresHealthAdapter implements DbHealthChecker {
       };
     } catch (e) {
       await qr.rollbackTransaction();
-      return { engine: 'postgres', status: 'error', error: e.message };
+      return { engine: "postgres", status: "error", error: e.message };
     } finally {
       await qr.release();
     }

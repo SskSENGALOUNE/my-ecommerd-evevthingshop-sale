@@ -37,6 +37,27 @@ export interface CustomerRegisterResponse {
   };
 }
 
+export interface CustomerGoogleLoginResponse {
+  success: boolean;
+  data: {
+    accessToken: string;
+    customer: {
+      id: string;
+      email: string;
+      name: string;
+    };
+  };
+}
+
+export async function loginCustomerWithGoogle(
+  supabaseAccessToken: string
+): Promise<CustomerGoogleLoginResponse> {
+  return apiClient<CustomerGoogleLoginResponse>("/auth/customer/google", {
+    method: "POST",
+    body: JSON.stringify({ accessToken: supabaseAccessToken }),
+  });
+}
+
 /**
  * Admin Login
  * @param email - Admin email

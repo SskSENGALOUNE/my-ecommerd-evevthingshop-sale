@@ -1,6 +1,6 @@
 export enum DatabaseEngine {
-  POSTGRES = 'postgres',
-  MYSQL = 'mysql',
-  SQLSERVER = 'sqlserver',
-  MONGO = 'mongo',
+  POSTGRES = "postgres",
+  MYSQL = "mysql",
+  SQLSERVER = "sqlserver",
+  MONGO = "mongo",
 }

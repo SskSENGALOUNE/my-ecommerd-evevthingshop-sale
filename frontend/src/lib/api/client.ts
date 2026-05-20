@@ -6,7 +6,7 @@ type FetchOptions = RequestInit & {
 
 export async function apiClient<T>(
   endpoint: string,
-  options: FetchOptions = {}
+  options: FetchOptions = {},
 ): Promise<T> {
   const { token, headers, ...rest } = options;
 
@@ -24,5 +24,6 @@ export async function apiClient<T>(
     throw new Error(error.message || "API request failed");
   }
 
+  if (res.status === 204) return undefined as T;
   return res.json();
 }

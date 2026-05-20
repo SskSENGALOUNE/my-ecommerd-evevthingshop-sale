@@ -1,14 +1,12 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
-import { CreateBannerCommand } from './create-banner.command';
-import * as bannerRepository from '../../../domain/banner/banner.repository';
-import { Banner } from '../../../domain/banner/banner.entity';
-import { BaseCommandResult } from '../../common/base-command-result';
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { Inject } from "@nestjs/common";
+import { CreateBannerCommand } from "./create-banner.command";
+import * as bannerRepository from "../../../domain/banner/banner.repository";
+import { Banner } from "../../../domain/banner/banner.entity";
+import { BaseCommandResult } from "../../common/base-command-result";
 
 @CommandHandler(CreateBannerCommand)
-export class CreateBannerHandler
-  implements ICommandHandler<CreateBannerCommand>
-{
+export class CreateBannerHandler implements ICommandHandler<CreateBannerCommand> {
   constructor(
     @Inject(bannerRepository.BANNER_REPOSITORY)
     private readonly repository: bannerRepository.IBannerRepository,

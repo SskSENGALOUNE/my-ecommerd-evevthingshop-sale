@@ -1,9 +1,9 @@
-import { ConflictException } from '@nestjs/common';
-import { CreateColorHandler } from './create-color.handler';
-import { CreateColorCommand } from './create-color.command';
-import type { IColorRepository } from '../../../domain/color/color.repository';
+import { ConflictException } from "@nestjs/common";
+import { CreateColorHandler } from "./create-color.handler";
+import { CreateColorCommand } from "./create-color.command";
+import type { IColorRepository } from "../../../domain/color/color.repository";
 
-describe('CreateColorHandler', () => {
+describe("CreateColorHandler", () => {
   let handler: CreateColorHandler;
   let repo: jest.Mocked<IColorRepository>;
 
@@ -19,38 +19,38 @@ describe('CreateColorHandler', () => {
     handler = new CreateColorHandler(repo);
   });
 
-  it('creates color when color is unique', async () => {
+  it("creates color when color is unique", async () => {
     repo.findByColor.mockResolvedValue(null);
     repo.create.mockResolvedValue({
-      id: 'uuid-1',
-      color: 'RED',
+      id: "uuid-1",
+      color: "RED",
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    const result = await handler.execute(new CreateColorCommand('RED'));
+    const result = await handler.execute(new CreateColorCommand("RED"));
 
-    expect(result.id).toBe('uuid-1');
-    expect(result.color).toBe('RED');
+    expect(result.id).toBe("uuid-1");
+    expect(result.color).toBe("RED");
     expect(result.isActive).toBe(true);
     expect(repo.create).toHaveBeenCalledWith({
-      color: 'RED',
+      color: "RED",
       isActive: true,
     });
   });
 
-  it('throws ConflictException when color exists', async () => {
+  it("throws ConflictException when color exists", async () => {
     repo.findByColor.mockResolvedValue({
-      id: 'uuid-1',
-      color: 'RED',
+      id: "uuid-1",
+      color: "RED",
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     await expect(
-      handler.execute(new CreateColorCommand('RED')),
+      handler.execute(new CreateColorCommand("RED")),
     ).rejects.toThrow(ConflictException);
     expect(repo.create).not.toHaveBeenCalled();
   });

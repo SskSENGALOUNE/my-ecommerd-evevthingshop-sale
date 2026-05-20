@@ -1,12 +1,10 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { GetBannerByIdQuery } from './get-banner-by-id.query';
-import * as bannerRepository from '../../../domain/banner/banner.repository';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
+import { GetBannerByIdQuery } from "./get-banner-by-id.query";
+import * as bannerRepository from "../../../domain/banner/banner.repository";
+import { Inject, NotFoundException } from "@nestjs/common";
 
 @QueryHandler(GetBannerByIdQuery)
-export class GetBannerByIdHandler
-  implements IQueryHandler<GetBannerByIdQuery>
-{
+export class GetBannerByIdHandler implements IQueryHandler<GetBannerByIdQuery> {
   constructor(
     @Inject(bannerRepository.BANNER_REPOSITORY)
     private readonly repository: bannerRepository.IBannerRepository,

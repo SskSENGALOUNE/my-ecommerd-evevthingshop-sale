@@ -1,6 +1,6 @@
-import { DataSource } from 'typeorm';
-import { DbHealthChecker } from './db-health-checker.port';
-import { DbHealthResult } from './db-health-result';
+import { DataSource } from "typeorm";
+import { DbHealthChecker } from "./db-health-checker.port";
+import { DbHealthResult } from "./db-health-result";
 
 // mysql.strategy.ts
 export class MysqlHealthAdapter implements DbHealthChecker {
@@ -24,8 +24,8 @@ export class MysqlHealthAdapter implements DbHealthChecker {
       await qr.rollbackTransaction();
 
       return {
-        engine: 'mysql',
-        status: 'ok',
+        engine: "mysql",
+        status: "ok",
         permissions: {
           select: true,
           insert: true,
@@ -35,10 +35,10 @@ export class MysqlHealthAdapter implements DbHealthChecker {
       };
     } catch (e) {
       await qr.rollbackTransaction();
-      const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+      const errorMessage = e instanceof Error ? e.message : "Unknown error";
       return {
-        engine: 'mysql',
-        status: 'error',
+        engine: "mysql",
+        status: "error",
         error: errorMessage,
       };
     } finally {

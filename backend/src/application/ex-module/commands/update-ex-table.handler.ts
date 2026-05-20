@@ -1,9 +1,9 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException } from '@nestjs/common';
-import { UpdateExTableCommand } from './update-ex-table.command';
-import type { IExTableRepository } from '../../../domain/ex-module/ex-table.repository';
-import { EX_TABLE_REPOSITORY } from '../../../domain/ex-module/ex-table.repository';
-import { ExTable } from '../../../domain/ex-module/ex-table.entity';
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { Inject, NotFoundException } from "@nestjs/common";
+import { UpdateExTableCommand } from "./update-ex-table.command";
+import type { IExTableRepository } from "../../../domain/ex-module/ex-table.repository";
+import { EX_TABLE_REPOSITORY } from "../../../domain/ex-module/ex-table.repository";
+import { ExTable } from "../../../domain/ex-module/ex-table.entity";
 
 @CommandHandler(UpdateExTableCommand)
 export class UpdateExTableHandler implements ICommandHandler<UpdateExTableCommand> {
@@ -14,7 +14,7 @@ export class UpdateExTableHandler implements ICommandHandler<UpdateExTableComman
 
   async execute(command: UpdateExTableCommand) {
     const existing = await this.repository.findById(command.id);
-    
+
     if (!existing) {
       throw new NotFoundException(`ExTable with id ${command.id} not found`);
     }

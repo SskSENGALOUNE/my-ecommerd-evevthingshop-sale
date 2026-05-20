@@ -1,20 +1,36 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, Patch, Delete, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { CreateBannerCommand } from '../../application/banner/commands/create-banner.command';
-import { CreateBannerDto } from './dto/create-banner.dto';
-import { UpdateBannerDto } from './dto/update-banner.dto';
-import { BannerResponseDto } from './dto/banner-response.dto';
-import { UpdateBannerCommand } from 'src/application/banner/commands/update-banner.command';
-import { DeleteBannerCommand } from 'src/application/banner/commands/delete-banner.command';
-import { GetAllBannersQuery } from 'src/application/banner/queries/get-all-banners.query';
-import { GetBannerByIdQuery } from 'src/application/banner/queries/get-banner-by-id.query';
-import { JwtAdminGuard } from '../auth/guards/jwt-admin.guard';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Param,
+  Patch,
+  Delete,
+  UseGuards,
+} from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from "@nestjs/swagger";
+import { CommandBus, QueryBus } from "@nestjs/cqrs";
+import { CreateBannerCommand } from "../../application/banner/commands/create-banner.command";
+import { CreateBannerDto } from "./dto/create-banner.dto";
+import { UpdateBannerDto } from "./dto/update-banner.dto";
+import { BannerResponseDto } from "./dto/banner-response.dto";
+import { UpdateBannerCommand } from "src/application/banner/commands/update-banner.command";
+import { DeleteBannerCommand } from "src/application/banner/commands/delete-banner.command";
+import { GetAllBannersQuery } from "src/application/banner/queries/get-all-banners.query";
+import { GetBannerByIdQuery } from "src/application/banner/queries/get-banner-by-id.query";
+import { JwtAdminGuard } from "../auth/guards/jwt-admin.guard";
 
-@ApiTags('admin/banners')
+@ApiTags("admin/banners")
 @ApiBearerAuth()
 @UseGuards(JwtAdminGuard)
-@Controller('admin/banners')
+@Controller("admin/banners")
 export class BannerController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -23,8 +39,12 @@ export class BannerController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create Banner' })
-  @ApiResponse({ status: 201, description: 'Banner created successfully', type: BannerResponseDto })
+  @ApiOperation({ summary: "Create Banner" })
+  @ApiResponse({
+    status: 201,
+    description: "Banner created successfully",
+    type: BannerResponseDto,
+  })
   async create(@Body() dto: CreateBannerDto) {
     const command = new CreateBannerCommand(
       dto.title,
@@ -38,27 +58,39 @@ export class BannerController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get All Banners' })
-  @ApiResponse({ status: 200, description: 'Get all banners successfully', type: [BannerResponseDto] })
+  @ApiOperation({ summary: "Get All Banners" })
+  @ApiResponse({
+    status: 200,
+    description: "Get all banners successfully",
+    type: [BannerResponseDto],
+  })
   async findAll() {
     const query = new GetAllBannersQuery();
     return await this.queryBus.execute(query);
   }
 
-  @Get(':id')
+  @Get(":id")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get Banner By Id' })
-  @ApiResponse({ status: 200, description: 'Get banner successfully', type: BannerResponseDto })
-  async findById(@Param('id') id: string) {
+  @ApiOperation({ summary: "Get Banner By Id" })
+  @ApiResponse({
+    status: 200,
+    description: "Get banner successfully",
+    type: BannerResponseDto,
+  })
+  async findById(@Param("id") id: string) {
     const query = new GetBannerByIdQuery(id);
     return await this.queryBus.execute(query);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update Banner' })
-  @ApiResponse({ status: 200, description: 'Banner updated successfully', type: BannerResponseDto })
-  async update(@Param('id') id: string, @Body() dto: UpdateBannerDto) {
+  @ApiOperation({ summary: "Update Banner" })
+  @ApiResponse({
+    status: 200,
+    description: "Banner updated successfully",
+    type: BannerResponseDto,
+  })
+  async update(@Param("id") id: string, @Body() dto: UpdateBannerDto) {
     const command = new UpdateBannerCommand(
       id,
       dto.title,
@@ -70,11 +102,11 @@ export class BannerController {
     return await this.commandBus.execute(command);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Delete Banner' })
-  @ApiResponse({ status: 200, description: 'Banner deleted successfully' })
-  async delete(@Param('id') id: string) {
+  @ApiOperation({ summary: "Delete Banner" })
+  @ApiResponse({ status: 200, description: "Banner deleted successfully" })
+  async delete(@Param("id") id: string) {
     const command = new DeleteBannerCommand(id);
     return await this.commandBus.execute(command);
   }

@@ -21,7 +21,7 @@ export default function EditBannerPage() {
         return;
       }
       const response = await getBannerById(params.id as string, token);
-      setBanner(response.data);
+      setBanner(response);
       setError(null);
     } catch (err) {
       setError(
@@ -51,7 +51,7 @@ export default function EditBannerPage() {
   if (!banner) {
     return (
       <div className="rounded-lg bg-muted p-4 text-muted-foreground">
-        ບໍ່ພົບ banner
+        ບໍ່ພົວ banner
       </div>
     );
   }

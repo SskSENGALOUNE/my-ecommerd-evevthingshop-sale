@@ -1,6 +1,6 @@
-import { Customer } from './customer.entity';
+import { Customer } from "./customer.entity";
 
-export const CUSTOMER_REPOSITORY = 'CUSTOMER_REPOSITORY';
+export const CUSTOMER_REPOSITORY = "CUSTOMER_REPOSITORY";
 
 export interface CreateCustomerData {
   email: string;
@@ -9,9 +9,16 @@ export interface CreateCustomerData {
   phone?: string;
 }
 
+export interface OAuthCustomerData {
+  email: string;
+  name: string;
+  supabaseId: string;
+}
+
 export interface ICustomerRepository {
   findByEmail(email: string): Promise<Customer | null>;
   findById(id: string): Promise<Customer | null>;
   existsByEmail(email: string): Promise<boolean>;
   create(data: CreateCustomerData): Promise<Customer>;
+  findOrCreateByOAuth(data: OAuthCustomerData): Promise<Customer>;
 }

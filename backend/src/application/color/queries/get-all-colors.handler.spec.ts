@@ -1,8 +1,8 @@
-import { GetAllColorsHandler } from './get-all-colors.handler';
-import { GetAllColorsQuery } from './get-all-colors.query';
-import type { IColorRepository } from '../../../domain/color/color.repository';
+import { GetAllColorsHandler } from "./get-all-colors.handler";
+import { GetAllColorsQuery } from "./get-all-colors.query";
+import type { IColorRepository } from "../../../domain/color/color.repository";
 
-describe('GetAllColorsHandler', () => {
+describe("GetAllColorsHandler", () => {
   let handler: GetAllColorsHandler;
   let repo: jest.Mocked<IColorRepository>;
 
@@ -18,18 +18,18 @@ describe('GetAllColorsHandler', () => {
     handler = new GetAllColorsHandler(repo);
   });
 
-  it('returns all colors', async () => {
+  it("returns all colors", async () => {
     const colors = [
       {
-        id: 'uuid-1',
-        color: 'RED',
+        id: "uuid-1",
+        color: "RED",
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        id: 'uuid-2',
-        color: 'BLUE',
+        id: "uuid-2",
+        color: "BLUE",
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -40,11 +40,11 @@ describe('GetAllColorsHandler', () => {
     const result = await handler.execute(new GetAllColorsQuery());
 
     expect(result).toHaveLength(2);
-    expect(result[0].color).toBe('RED');
-    expect(result[1].color).toBe('BLUE');
+    expect(result[0].color).toBe("RED");
+    expect(result[1].color).toBe("BLUE");
   });
 
-  it('returns empty array when no colors exist', async () => {
+  it("returns empty array when no colors exist", async () => {
     repo.findAll.mockResolvedValue([]);
 
     const result = await handler.execute(new GetAllColorsQuery());

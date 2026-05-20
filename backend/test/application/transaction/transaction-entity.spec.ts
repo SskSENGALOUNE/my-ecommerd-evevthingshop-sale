@@ -1,22 +1,22 @@
-import { TransactionEntity } from '../../../src/domain/transaction/transaction-entity';
+import { TransactionEntity } from "../../../src/domain/transaction/transaction-entity";
 
-describe('TransactionEntity', () => {
+describe("TransactionEntity", () => {
   const mockData = {
-    id: '1',
-    transectionId: 'TXN001',
-    merchantId: 'MERCHANT001',
-    orderId: 'ORDER001',
-    merchant_name: 'Test Merchant',
+    id: "1",
+    transectionId: "TXN001",
+    merchantId: "MERCHANT001",
+    orderId: "ORDER001",
+    merchant_name: "Test Merchant",
     amount: 1000,
-    status: 'SUCCESS',
+    status: "SUCCESS",
     post_request: '{"amount": 1000}',
     bank_response: '{"status": "approved"}',
     bank_request: '{"request": "data"}',
-    bank_type: 'VISA',
-    createdAt: new Date('2024-01-01'),
+    bank_type: "VISA",
+    createdAt: new Date("2024-01-01"),
   };
 
-  it('should create entity using reconstitute method', () => {
+  it("should create entity using reconstitute method", () => {
     const entity = TransactionEntity.reconstitute(
       mockData.id,
       mockData.transectionId,
@@ -47,7 +47,7 @@ describe('TransactionEntity', () => {
     expect(entity.createdAt).toBe(mockData.createdAt);
   });
 
-  it('should have readonly properties', () => {
+  it("should have readonly properties", () => {
     const entity = TransactionEntity.reconstitute(
       mockData.id,
       mockData.transectionId,
@@ -65,7 +65,7 @@ describe('TransactionEntity', () => {
 
     // Properties should be readonly (TypeScript compile-time check)
     expect(() => {
-      (entity as any).id = 'new-id';
+      (entity as any).id = "new-id";
     }).not.toThrow(); // Runtime doesn't prevent this, but TypeScript does
   });
 });

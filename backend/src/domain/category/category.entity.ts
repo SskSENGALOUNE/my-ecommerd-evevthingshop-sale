@@ -5,11 +5,9 @@ export class Category {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly deletedAt: Date | null,
-  ) { }
+  ) {}
 
-  static create(
-    name: string,
-  ): { name: string } {
+  static create(name: string): { name: string } {
     return { name };
   }
 
@@ -20,12 +18,6 @@ export class Category {
     updatedAt: Date,
     deletedAt: Date | null,
   ): Category {
-    return new Category(
-      id,
-      name,
-      createdAt,
-      updatedAt,
-      deletedAt,
-    );
+    return new Category(id, name, createdAt, updatedAt, deletedAt);
   }
 }

@@ -29,10 +29,21 @@ export function AdminLoginForm({ onSuccess }: AdminLoginFormProps) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<AdminLoginFormData>({
     resolver: zodResolver(adminLoginSchema),
   });
+
+  const PRESET_ACCOUNTS = [
+    { label: "Super Admin", email: "superadmin@shop.com", password: "SuperAdmin@1234", color: "bg-violet-100 text-violet-700 border-violet-200" },
+    { label: "Admin", email: "admin@shop.com", password: "Admin@1234", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  ];
+
+  const handleQuickLogin = (email: string, password: string) => {
+    setValue("email", email, { shouldValidate: true });
+    setValue("password", password, { shouldValidate: true });
+  };
 
   const onSubmit = async (data: AdminLoginFormData) => {
     setIsLoading(true);
@@ -59,6 +70,33 @@ export function AdminLoginForm({ onSuccess }: AdminLoginFormProps) {
   };
 
   return (
+    <div className="space-y-4">
+      {/* Quick Login */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted-foreground">Quick Login</p>
+        <div className="flex gap-2">
+          {PRESET_ACCOUNTS.map((account) => (
+            <button
+              key={account.email}
+              type="button"
+              onClick={() => handleQuickLogin(account.email, account.password)}
+              className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all hover:opacity-80 ${account.color}`}
+            >
+              {account.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs text-muted-foreground">
+          <span className="bg-background px-2">ຫຼື ກອກດ້ວຍຕົນເອງ</span>
+        </div>
+      </div>
+
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Email Input */}
       <div className="space-y-2">
@@ -113,5 +151,6 @@ export function AdminLoginForm({ onSuccess }: AdminLoginFormProps) {
         {isLoading ? "ກຳລັງເຂົ້າສູ່ລະບົບ..." : "ເຂົ້າສູ່ລະບົບ"}
       </Button>
     </form>
+    </div>
   );
 }

@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma.service";
 import {
   IBannerRepository,
   CreateBannerData,
   UpdateBannerData,
   BannerData,
-} from '../../../domain/banner/banner.repository';
+} from "../../../domain/banner/banner.repository";
 
 @Injectable()
 export class BannerRepositoryImpl implements IBannerRepository {
@@ -35,7 +35,7 @@ export class BannerRepositoryImpl implements IBannerRepository {
   async findAll(): Promise<BannerData[]> {
     const results = await this.prisma.banner.findMany({
       where: { deletedAt: null },
-      orderBy: { order: 'asc' },
+      orderBy: { order: "asc" },
     });
     return results.map((result) => this.mapToBannerData(result));
   }

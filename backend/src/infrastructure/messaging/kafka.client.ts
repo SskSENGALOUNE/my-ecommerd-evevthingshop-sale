@@ -5,8 +5,8 @@ import {
   KafkaConfig,
   ProducerConfig,
   ConsumerConfig,
-} from 'kafkajs';
-import { getKafkaConfig } from './kafka.config';
+} from "kafkajs";
+import { getKafkaConfig } from "./kafka.config";
 
 type KafkaClientConfig = {
   client: KafkaConfig;

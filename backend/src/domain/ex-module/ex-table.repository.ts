@@ -26,4 +26,4 @@ export interface ExTableData {
   updatedBy: string;
 }
 
-export const EX_TABLE_REPOSITORY = Symbol('EX_TABLE_REPOSITORY');
+export const EX_TABLE_REPOSITORY = Symbol("EX_TABLE_REPOSITORY");

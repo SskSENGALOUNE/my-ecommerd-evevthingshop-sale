@@ -1,11 +1,17 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Inject } from '@nestjs/common';
-import { CUSTOMER_REPOSITORY, type ICustomerRepository } from '../../../domain/customer/customer.repository';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { Inject } from "@nestjs/common";
+import {
+  CUSTOMER_REPOSITORY,
+  type ICustomerRepository,
+} from "../../../domain/customer/customer.repository";
 
 @Injectable()
-export class JwtCustomerStrategy extends PassportStrategy(Strategy, 'jwt-customer') {
+export class JwtCustomerStrategy extends PassportStrategy(
+  Strategy,
+  "jwt-customer",
+) {
   constructor(
     @Inject(CUSTOMER_REPOSITORY)
     private readonly customerRepository: ICustomerRepository,
@@ -17,7 +23,7 @@ export class JwtCustomerStrategy extends PassportStrategy(Strategy, 'jwt-custome
   }
 
   async validate(payload: { sub: string; email: string; type: string }) {
-    if (payload.type !== 'customer') throw new UnauthorizedException();
+    if (payload.type !== "customer") throw new UnauthorizedException();
     const customer = await this.customerRepository.findById(payload.sub);
     if (!customer || !customer.isActive) throw new UnauthorizedException();
     return { id: customer.id, email: customer.email, name: customer.name };

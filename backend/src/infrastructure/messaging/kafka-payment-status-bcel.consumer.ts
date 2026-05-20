@@ -3,9 +3,9 @@ import {
   OnModuleInit,
   OnModuleDestroy,
   Logger,
-} from '@nestjs/common';
-import { KafkaClient } from './kafka.client';
-import { Consumer } from 'kafkajs';
+} from "@nestjs/common";
+import { KafkaClient } from "./kafka.client";
+import { Consumer } from "kafkajs";
 
 @Injectable()
 export class KafkaPaymentStatusBCELConsumer
@@ -19,17 +19,17 @@ export class KafkaPaymentStatusBCELConsumer
   }
 
   async onModuleInit() {
-    const isKafkaEnabled = process.env.KAFKA_ENABLED === 'true';
-    
+    const isKafkaEnabled = process.env.KAFKA_ENABLED === "true";
+
     if (!isKafkaEnabled) {
-      this.logger.log('Kafka is disabled, skipping consumer initialization');
+      this.logger.log("Kafka is disabled, skipping consumer initialization");
       return;
     }
 
     try {
       await this.consumer.connect();
       await this.consumer.subscribe({
-        topic: 'payment.status.bcel',
+        topic: "payment.status.bcel",
         fromBeginning: false,
       });
 
@@ -38,7 +38,7 @@ export class KafkaPaymentStatusBCELConsumer
           try {
             const value = message.value?.toString();
             if (!value) {
-              this.logger.warn('Received empty message');
+              this.logger.warn("Received empty message");
               return;
             }
 
@@ -57,7 +57,7 @@ export class KafkaPaymentStatusBCELConsumer
         },
       });
 
-      this.logger.log('Kafka consumer started for topic: payment.status.bcel');
+      this.logger.log("Kafka consumer started for topic: payment.status.bcel");
     } catch (error) {
       this.logger.error(
         `Failed to initialize Kafka consumer: ${error instanceof Error ? error.message : error}`,
@@ -67,15 +67,15 @@ export class KafkaPaymentStatusBCELConsumer
   }
 
   async onModuleDestroy() {
-    const isKafkaEnabled = process.env.KAFKA_ENABLED === 'true';
-    
+    const isKafkaEnabled = process.env.KAFKA_ENABLED === "true";
+
     if (!isKafkaEnabled) {
       return;
     }
 
     try {
       await this.consumer.disconnect();
-      this.logger.log('Kafka consumer disconnected');
+      this.logger.log("Kafka consumer disconnected");
     } catch (error) {
       this.logger.error(
         `Error disconnecting Kafka consumer: ${error instanceof Error ? error.message : error}`,

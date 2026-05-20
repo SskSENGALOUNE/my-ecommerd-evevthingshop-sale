@@ -1,7 +1,7 @@
 // mongo.strategy.ts
-import { MongoClient, Db, Collection } from 'mongodb';
-import { DbHealthChecker } from './db-health-checker.port';
-import { DbHealthResult } from './db-health-result';
+import { MongoClient, Db, Collection } from "mongodb";
+import { DbHealthChecker } from "./db-health-checker.port";
+import { DbHealthResult } from "./db-health-result";
 
 export class MongoHealthAdapter implements DbHealthChecker {
   private client: MongoClient;
@@ -19,7 +19,7 @@ export class MongoHealthAdapter implements DbHealthChecker {
       await this.client.connect();
       db = this.client.db();
 
-      collection = db.collection('health_test');
+      collection = db.collection("health_test");
 
       // INSERT
       await collection.insertOne({ value: 1 });
@@ -34,8 +34,8 @@ export class MongoHealthAdapter implements DbHealthChecker {
       await collection.deleteMany({});
 
       return {
-        engine: 'mongo',
-        status: 'ok',
+        engine: "mongo",
+        status: "ok",
         permissions: {
           select: true,
           insert: true,
@@ -47,8 +47,8 @@ export class MongoHealthAdapter implements DbHealthChecker {
       const errorMessage = e instanceof Error ? e.message : String(e);
 
       return {
-        engine: 'mongo',
-        status: 'error',
+        engine: "mongo",
+        status: "error",
         error: errorMessage,
       };
     } finally {

@@ -1,5 +1,5 @@
-import { EventsHandler } from '@nestjs/cqrs';
-import { PaymentChangeStatusEvent } from './payment-status-change.event';
+import { EventsHandler } from "@nestjs/cqrs";
+import { PaymentChangeStatusEvent } from "./payment-status-change.event";
 
 @EventsHandler(PaymentChangeStatusEvent)
 export class NotifyMerchantPaymentStatusChangedHandler {

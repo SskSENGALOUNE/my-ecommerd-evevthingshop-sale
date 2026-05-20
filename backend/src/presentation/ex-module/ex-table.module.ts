@@ -1,16 +1,16 @@
-import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
-import { ExTableController } from './ex-table.controller';
-import { ApplicationModule } from '../../application/application.module';
+import { Module } from "@nestjs/common";
+import { CqrsModule } from "@nestjs/cqrs";
+import { ExTableController } from "./ex-table.controller";
+import { ApplicationModule } from "../../application/application.module";
 import {
   CreateExTableHandler,
   UpdateExTableHandler,
   DeleteExTableHandler,
-} from '../../application/ex-module/commands';
+} from "../../application/ex-module/commands";
 import {
   GetExTableByIdHandler,
   GetAllExTablesHandler,
-} from '../../application/ex-module/queries';
+} from "../../application/ex-module/queries";
 
 const CommandHandlers = [
   CreateExTableHandler,

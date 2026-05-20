@@ -34,4 +34,4 @@ export interface BannerData {
   deletedAt: Date | null;
 }
 
-export const BANNER_REPOSITORY = Symbol('BANNER_REPOSITORY');
+export const BANNER_REPOSITORY = Symbol("BANNER_REPOSITORY");

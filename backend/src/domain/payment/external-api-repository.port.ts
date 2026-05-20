@@ -1,4 +1,4 @@
-import { CallBackPaymentStatusRequestDto } from './callback-payment-status.request.dto';
+import { CallBackPaymentStatusRequestDto } from "./callback-payment-status.request.dto";
 
 export interface ExternalApiRepositoryPort {
   PushPaymentNotification(

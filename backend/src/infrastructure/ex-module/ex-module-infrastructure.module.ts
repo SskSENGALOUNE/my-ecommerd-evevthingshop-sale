@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
-import { ExTableRepositoryImpl } from '../prisma/repositories/ex-table.repository.impl';
-import { EX_TABLE_REPOSITORY } from '../../domain/ex-module/ex-table.repository';
+import { Module } from "@nestjs/common";
+import { PrismaModule } from "../prisma/prisma.module";
+import { ExTableRepositoryImpl } from "../prisma/repositories/ex-table.repository.impl";
+import { EX_TABLE_REPOSITORY } from "../../domain/ex-module/ex-table.repository";
 
 @Module({
   imports: [PrismaModule],

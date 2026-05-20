@@ -1,13 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
-import type { HttpClient } from 'src/application/ports/http-client.port';
-import { CallBackPaymentStatusRequestDto } from 'src/domain/payment/callback-payment-status.request.dto';
-import { ExternalApiRepositoryPort } from 'src/domain/payment/external-api-repository.port';
-import { HttpResponse } from '../http/http.response.dto';
+import { Inject, Injectable } from "@nestjs/common";
+import type { HttpClient } from "src/application/ports/http-client.port";
+import { CallBackPaymentStatusRequestDto } from "src/domain/payment/callback-payment-status.request.dto";
+import { ExternalApiRepositoryPort } from "src/domain/payment/external-api-repository.port";
+import { HttpResponse } from "../http/http.response.dto";
 
 @Injectable()
 export class PosExternalApiRepositoryAdapter implements ExternalApiRepositoryPort {
   constructor(
-    @Inject('HttpClient')
+    @Inject("HttpClient")
     private readonly httpClient: HttpClient,
   ) {}
 

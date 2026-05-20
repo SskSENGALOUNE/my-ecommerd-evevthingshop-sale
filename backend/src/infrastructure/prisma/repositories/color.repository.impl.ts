@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { ColorType } from '@prisma/client';
-import { PrismaService } from '../prisma.service';
+import { Injectable } from "@nestjs/common";
+import { ColorType } from "@prisma/client";
+import { PrismaService } from "../prisma.service";
 import {
   IColorRepository,
   CreateColorData,
   UpdateColorData,
   ColorData,
-} from '../../../domain/color/color.repository';
+} from "../../../domain/color/color.repository";
 
 @Injectable()
 export class ColorRepositoryImpl implements IColorRepository {
@@ -31,7 +31,7 @@ export class ColorRepositoryImpl implements IColorRepository {
 
   async findAll(): Promise<ColorData[]> {
     const colors = await this.prisma.color.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
     return colors.map((color) => this.mapToColorData(color));
   }

@@ -40,13 +40,20 @@ export interface BannerResponse {
   deletedAt: string | null;
 }
 
+// Public — ไม่ต้อง token
+export async function getPublicBanners(): Promise<Banner[]> {
+  const response = await apiClient<{ success: boolean; data: Banner[] }>(
+    "/banners",
+    { method: "GET" }
+  );
+  return response.data || [];
+}
+
+// Admin
 export async function getBanners(token: string): Promise<Banner[]> {
   const response = await apiClient<{ success: boolean; data: Banner[] }>(
     "/banners",
-    {
-      method: "GET",
-      token,
-    }
+    { method: "GET", token }
   );
   return response.data || [];
 }

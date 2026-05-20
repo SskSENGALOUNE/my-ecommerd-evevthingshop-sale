@@ -1,9 +1,12 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { useEffect, useState } from "react";
 
 interface User {
   id: string;
   email: string;
   name: string;
+  avatarUrl?: string;
 }
 
 interface Admin {
@@ -24,13 +27,35 @@ interface AuthState {
   adminLogout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  admin: null,
-  customerToken: null,
-  adminToken: null,
-  setUser: (user, token) => set({ user, customerToken: token }),
-  setAdmin: (admin, token) => set({ admin, adminToken: token }),
-  logout: () => set({ user: null, customerToken: null }),
-  adminLogout: () => set({ admin: null, adminToken: null }),
-}));
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      admin: null,
+      customerToken: null,
+      adminToken: null,
+      setUser: (user, token) => set({ user, customerToken: token }),
+      setAdmin: (admin, token) => set({ admin, adminToken: token }),
+      logout: () => set({ user: null, customerToken: null }),
+      adminLogout: () => set({ admin: null, adminToken: null }),
+    }),
+    {
+      name: "auth-store",
+      partialize: (state) => ({
+        user: state.user,
+        customerToken: state.customerToken,
+        admin: state.admin,
+        adminToken: state.adminToken,
+      }),
+    }
+  )
+);
+
+// รอ Zustand hydrate จาก localStorage ก่อน ป้องกัน redirect ผิดพลาด
+export function useHasHydrated() {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  return hydrated;
+}

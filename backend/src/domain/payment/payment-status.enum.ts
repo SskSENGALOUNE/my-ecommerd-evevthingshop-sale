@@ -1,4 +1,4 @@
 export enum PaymentStatus {
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
 }

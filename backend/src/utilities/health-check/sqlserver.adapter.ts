@@ -1,6 +1,6 @@
-import { DataSource } from 'typeorm';
-import { DbHealthResult } from './db-health-result';
-import { DbHealthChecker } from './db-health-checker.port';
+import { DataSource } from "typeorm";
+import { DbHealthResult } from "./db-health-result";
+import { DbHealthChecker } from "./db-health-checker.port";
 
 // sqlserver.strategy.ts
 export class SqlServerHealthAdapter implements DbHealthChecker {
@@ -24,8 +24,8 @@ export class SqlServerHealthAdapter implements DbHealthChecker {
       await qr.rollbackTransaction();
 
       return {
-        engine: 'sqlserver',
-        status: 'ok',
+        engine: "sqlserver",
+        status: "ok",
         permissions: {
           select: true,
           insert: true,
@@ -35,7 +35,7 @@ export class SqlServerHealthAdapter implements DbHealthChecker {
       };
     } catch (e) {
       await qr.rollbackTransaction();
-      return { engine: 'sqlserver', status: 'error', error: e.message };
+      return { engine: "sqlserver", status: "error", error: e.message };
     } finally {
       await qr.release();
     }

@@ -1,7 +1,7 @@
-import { PaymentStatus } from '../../../domain/payment/payment-status-bcel.dto';
+import { PaymentStatus } from "../../../domain/payment/payment-status-bcel.dto";
 
 export const PAYMENT_STATUS_BCEL_PUBLISHER = Symbol(
-  'PaymentStatusBCELPublisher',
+  "PaymentStatusBCELPublisher",
 );
 
 export interface PaymentStatusBCELPublisher {
